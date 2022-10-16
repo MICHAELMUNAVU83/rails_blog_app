@@ -14,6 +14,8 @@ class CommentsController < ApplicationController
   # GET posts/1/comments/new
   def new
     @comment = @post.comments.build
+    @comment.user_id = current_user.id
+
   end
 
   # GET posts/1/comments/1/edit
@@ -23,6 +25,7 @@ class CommentsController < ApplicationController
   # POST posts/1/comments
   def create
     @comment = @post.comments.build(comment_params)
+    @comment.user_id = current_user.id
 
     if @comment.save
       redirect_to([@comment.post, @comment], notice: 'Comment was successfully created.')
@@ -33,11 +36,11 @@ class CommentsController < ApplicationController
 
   # PUT posts/1/comments/1
   def update
-    if @comment.update_attributes(comment_params)
-      redirect_to([@comment.post, @comment], notice: 'Comment was successfully updated.')
-    else
-      render action: 'edit'
-    end
+   @comment.user_id = current_user.id
+   @comment.post_id = @post.id
+   @comment.update(comment_params)
+   redirect_to post_comments_url(@post)
+
   end
 
   # DELETE posts/1/comments/1
@@ -59,6 +62,6 @@ class CommentsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def comment_params
-      params.require(:comment).permit(:text, :post_id, :user_id)
+      params.require(:comment).permit(:text)
     end
 end
